@@ -31,6 +31,4 @@ extension StartViewController: ColorViewControllerDelegate {
     func setBackgroundColor(_ color: UIColor) {
         view.backgroundColor = color
     }
-    
-    
 }
