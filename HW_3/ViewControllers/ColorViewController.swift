@@ -118,43 +118,51 @@ final class ColorViewController: UIViewController {
         alert.addAction(okAction)
         present(alert, animated: true)
     }
-    
-    func updateValue() {
-        redValueLabel.text = String(Float(redTextField.text ?? "0") ?? 0)
-        redSlider.setValue((Float(redValueLabel.text ?? "0") ?? 0), animated: true)
-        
-        greenValueLabel.text = String(Float(greenTextField.text ?? "0") ?? 0)
-        greenSlider.setValue((Float(greenValueLabel.text ?? "0") ?? 0), animated: true)
-        
-        blueValueLabel.text = String(Float(blueTextField.text ?? "0") ?? 0)
-        blueSlider.setValue((Float(blueValueLabel.text ?? "0") ?? 0), animated: true)
-        
-        changeColor()
-    }
 }
 
 //MARK: - UITextFieldDelegate
 extension ColorViewController: UITextFieldDelegate {
-
+    
     func textFieldDidEndEditing(_ textField: UITextField) {
-        guard let text = Float(textField.text ?? "0") else {
-            showAlert(title: "Wrong format!", message: "Enter valid values from 0.0 to 1.0")
-            textField.text = "0"
-            
-            updateValue ()
-            return
-        }
+        guard let text = textField.text else { return }
         
-        if 0...1 ~= text {
-            updateValue ()
+        
+        if let currentValue = Float(text), 0...1 ~= currentValue  {
+            switch textField {
+            case redTextField:
+                redSlider.setValue(currentValue, animated: true)
+                setValueText(for: redValueLabel)
+            case greenTextField:
+                greenSlider.setValue(currentValue, animated: true)
+                setValueText(for: greenValueLabel)
+            default:
+                blueSlider.setValue(currentValue, animated: true)
+                setValueText(for: blueValueLabel)
+            }
+            changeColor()
+            
         } else {
-            showAlert(title: "Wrong format!", message: "Please enter value from 0.0 to 1.0")
-            textField.text = "0"
+            showAlert(title: "Wrong format!", message: "Enter valid value from 0.0 to 1.0")
+            switch textField {
+            case redTextField:
+                redSlider.setValue(0, animated: true)
+                redValueLabel.text = "0.00"
+                redTextField.text = "0.00"
+            case greenTextField:
+                greenSlider.setValue(0, animated: true)
+                greenValueLabel.text = "0.00"
+                greenTextField.text = "0.00"
+            default:
+                blueSlider.setValue(0, animated: true)
+                blueValueLabel.text = "0.00"
+                blueTextField.text = "0.00"
+            }
+            
+            changeColor()
         }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        updateValue()
-        return textField.resignFirstResponder()
+        textField.resignFirstResponder()
     }
 }
