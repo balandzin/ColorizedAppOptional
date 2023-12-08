@@ -119,7 +119,7 @@ final class ColorViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    func updateValue () {
+    func updateValue() {
         redValueLabel.text = String(Float(redTextField.text ?? "0") ?? 0)
         redSlider.setValue((Float(redValueLabel.text ?? "0") ?? 0), animated: true)
         
@@ -138,7 +138,7 @@ extension ColorViewController: UITextFieldDelegate {
 
     func textFieldDidEndEditing(_ textField: UITextField) {
         guard let text = Float(textField.text ?? "0") else {
-            showAlert(title: "Wrong format!", message: "Please enter value from 0.0 to 1.0")
+            showAlert(title: "Wrong format!", message: "Enter valid values from 0.0 to 1.0")
             textField.text = "0"
             
             updateValue ()
@@ -154,7 +154,7 @@ extension ColorViewController: UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
+        updateValue()
+        return textField.resignFirstResponder()
     }
 }
-
