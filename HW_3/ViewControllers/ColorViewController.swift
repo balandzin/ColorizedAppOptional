@@ -9,7 +9,7 @@ import UIKit
 
 final class ColorViewController: UIViewController {
     
-    @IBOutlet var colorfulLabel: UIView!
+    @IBOutlet var colorLabel: UIView!
     
     @IBOutlet var redValueLabel: UILabel!
     @IBOutlet var greenValueLabel: UILabel!
@@ -27,14 +27,14 @@ final class ColorViewController: UIViewController {
     
     let numberToolbar: UIToolbar = UIToolbar()
     
-    var startBackgroundColor: UIColor!
+    var color: UIColor!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        colorfulLabel.layer.cornerRadius = 25
+        colorLabel.layer.cornerRadius = 25
         
-        colorfulLabel.backgroundColor = startBackgroundColor
+        colorLabel.backgroundColor = color
         
         setValueColor(for: redSlider, greenSlider, blueSlider)
         setValueText(for: redValueLabel, greenValueLabel, blueValueLabel)
@@ -66,12 +66,12 @@ final class ColorViewController: UIViewController {
     }
     
     @IBAction func doneButtonAction() {
-        delegate.setBackgroundColor(colorfulLabel.backgroundColor ?? .yellow)
+        delegate.setColor(colorLabel.backgroundColor ?? .yellow)
         dismiss(animated: true)
     }
     
     private func changeColor() {
-        colorfulLabel.backgroundColor = UIColor(
+        colorLabel.backgroundColor = UIColor(
             red: CGFloat(redSlider.value),
             green: CGFloat(greenSlider.value),
             blue: CGFloat(blueSlider.value),
@@ -86,7 +86,7 @@ final class ColorViewController: UIViewController {
     }
     
     private func setValueColor(for sliders: UISlider...) {
-        let color = CIColor(color: startBackgroundColor)
+        let color = CIColor(color: color)
         sliders.forEach { slider in
             switch slider {
             case redSlider: redSlider.value = Float(color.red)
