@@ -11,9 +11,9 @@ final class ColorViewController: UIViewController {
     
     @IBOutlet var colorLabel: UIView!
     
-    @IBOutlet var redValueLabel: UILabel!
-    @IBOutlet var greenValueLabel: UILabel!
-    @IBOutlet var blueValueLabel: UILabel!
+    @IBOutlet var redLabel: UILabel!
+    @IBOutlet var greenLabel: UILabel!
+    @IBOutlet var blueLabel: UILabel!
     
     @IBOutlet var redSlider: UISlider!
     @IBOutlet var blueSlider: UISlider!
@@ -29,7 +29,7 @@ final class ColorViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        colorLabel.layer.cornerRadius = 25
+        colorLabel.layer.cornerRadius = 10
         
         redSlider.tintColor = .red
         greenSlider.tintColor = .green
@@ -37,7 +37,7 @@ final class ColorViewController: UIViewController {
         colorLabel.backgroundColor = color
         
         setValue(for: redSlider, greenSlider, blueSlider)
-        setValue(for: redValueLabel, greenValueLabel, blueValueLabel)
+        setValue(for: redLabel, greenLabel, blueLabel)
         setValue(for: redTextField, greenTextField, blueTextField)
         
         redTextField.delegate = self
@@ -51,28 +51,28 @@ final class ColorViewController: UIViewController {
     }
     
     @IBAction func sliderAction(_ sender: UISlider) {
-        changeColor()
-        //setValue()
-        
         switch sender {
         case redSlider:
-            setValue(for: redValueLabel)
+            setValue(for: redLabel)
+            setValue(for: redTextField)
         case greenSlider:
-            setValue(for: greenValueLabel)
+            setValue(for: greenLabel)
+            setValue(for: greenTextField)
         default:
-            setValue(for: blueValueLabel)
+            setValue(for: blueLabel)
+            setValue(for: blueTextField)
         }
+
+        changeColor()
     }
     
     @IBAction func doneButtonAction() {
         delegate.setColor(colorLabel.backgroundColor ?? .yellow)
         dismiss(animated: true)
     }
-    
-    private func string(from slider: UISlider) -> String {
-        String(format: "%.2f", slider.value)
-    }
-    
+}
+
+extension ColorViewController {
     private func changeColor() {
         colorLabel.backgroundColor = UIColor(
             red: CGFloat(redSlider.value),
@@ -85,8 +85,8 @@ final class ColorViewController: UIViewController {
     private func setValue(for labels: UILabel...) {
         labels.forEach { label in
             switch label {
-            case redValueLabel: redValueLabel.text = string(from: redSlider)
-            case greenValueLabel: greenValueLabel.text = string(from: greenSlider)
+            case redLabel: redLabel.text = string(from: redSlider)
+            case greenLabel: greenLabel.text = string(from: greenSlider)
             default: label.text = string(from: blueSlider)
             }
         }
@@ -104,7 +104,6 @@ final class ColorViewController: UIViewController {
     }
     
     private func setValue(for textFields: UITextField...) {
-        
         textFields.forEach { textField in
             switch textField {
             case redTextField: textField.text = string(from: redSlider)
@@ -114,61 +113,78 @@ final class ColorViewController: UIViewController {
         }
     }
     
-    private func showAlert(title: String, message: String) {
+    private func showAlert(title: String, message: String, textField: UITextField? = nil) {
         let alert = UIAlertController(
             title: title,
             message: message,
             preferredStyle: .alert
         )
-        let okAction = UIAlertAction(title: "OK", style: .default)
+        let okAction = UIAlertAction(title: "OK", style: .default) {_ in
+            textField?.text = "0.50"
+            textField?.becomeFirstResponder()
+        }
         alert.addAction(okAction)
         present(alert, animated: true)
+    }
+    
+    private func string(from slider: UISlider) -> String {
+        String(format: "%.2f", slider.value)
     }
 }
 
 //MARK: - UITextFieldDelegate
 extension ColorViewController: UITextFieldDelegate {
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        guard let text = textField.text else { return }
-        
-        
-        if let currentValue = Float(text), 0...1 ~= currentValue  {
-            switch textField {
-            case redTextField:
-                redSlider.setValue(currentValue, animated: true)
-                setValue(for: redValueLabel)
-            case greenTextField:
-                greenSlider.setValue(currentValue, animated: true)
-                setValue(for: greenValueLabel)
-            default:
-                blueSlider.setValue(currentValue, animated: true)
-                setValue(for: blueValueLabel)
-            }
-            changeColor()
-            
-        } else {
-            showAlert(title: "Wrong format!", message: "Enter valid value from 0.0 to 1.0")
-            switch textField {
-            case redTextField:
-                redSlider.setValue(0, animated: true)
-                redValueLabel.text = "0.00"
-                redTextField.text = "0.00"
-            case greenTextField:
-                greenSlider.setValue(0, animated: true)
-                greenValueLabel.text = "0.00"
-                greenTextField.text = "0.00"
-            default:
-                blueSlider.setValue(0, animated: true)
-                blueValueLabel.text = "0.00"
-                blueTextField.text = "0.00"
-            }
-            
-            changeColor()
-        }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder() // включает кнопку return для клавиатуры
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        guard let text = textField.text else {
+            showAlert(title: "Wrong format!", message: "Please enter correct value")
+            return
+        }
+        guard let currentValue = Float(text), (0...1).contains(currentValue) else {
+            showAlert(
+                title: "Wrong format!",
+                message: "Please enter correct value",
+                textField: textField
+            )
+            return
+        }
+        
+        switch textField {
+        case redTextField:
+            redSlider.setValue(currentValue, animated: true)
+            setValue(for: redLabel)
+        case greenTextField:
+            greenSlider.setValue(currentValue, animated: true)
+            setValue(for: greenLabel)
+        default:
+            blueSlider.setValue(currentValue, animated: true)
+            setValue(for: blueLabel)
+        }
+        
+        changeColor()
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        guard textField != redTextField else { return } // для красного текстового поля нет тулбара
+        let keyboardToolbar = UIToolbar()
+        keyboardToolbar.sizeToFit()
+        textField.inputAccessoryView = keyboardToolbar
+        
+        let doneButton = UIBarButtonItem(
+            barButtonSystemItem: .done, // кнопка DONE!!!!
+            target: textField,
+            action: #selector(resignFirstResponder)
+        )
+        
+        let flexBarButton = UIBarButtonItem(
+            barButtonSystemItem: .flexibleSpace,
+            target: nil,
+            action: nil
+        )
+        
+        keyboardToolbar.items = [flexBarButton, doneButton]
     }
 }

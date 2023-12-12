@@ -173,16 +173,16 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="blueLabel" destination="bIT-k0-jhX" id="wAK-Ip-6wB"/>
                         <outlet property="blueSlider" destination="LnM-oM-hUz" id="z4l-CQ-YBC"/>
                         <outlet property="blueTextField" destination="Biq-yH-3Ba" id="EN1-6r-xeA"/>
-                        <outlet property="blueValueLabel" destination="bIT-k0-jhX" id="wAK-Ip-6wB"/>
                         <outlet property="colorLabel" destination="838-ej-aAq" id="CMi-PH-xmD"/>
+                        <outlet property="greenLabel" destination="rPd-Fy-JEc" id="EWN-Qw-ea8"/>
                         <outlet property="greenSlider" destination="FXU-49-Ulv" id="nui-mU-DBg"/>
                         <outlet property="greenTextField" destination="pl7-5d-yjF" id="JOZ-VU-S1K"/>
-                        <outlet property="greenValueLabel" destination="rPd-Fy-JEc" id="EWN-Qw-ea8"/>
+                        <outlet property="redLabel" destination="AtI-t5-WuK" id="cwV-Oa-B6G"/>
                         <outlet property="redSlider" destination="eJt-g8-ly6" id="m7p-LO-tC1"/>
                         <outlet property="redTextField" destination="KGu-Gz-1m6" id="6bj-bZ-vCk"/>
-                        <outlet property="redValueLabel" destination="AtI-t5-WuK" id="cwV-Oa-B6G"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
