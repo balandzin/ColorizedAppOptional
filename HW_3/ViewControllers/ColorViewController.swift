@@ -23,10 +23,7 @@ final class ColorViewController: UIViewController {
     @IBOutlet var greenTextField: UITextField!
     @IBOutlet var blueTextField: UITextField!
     
-    weak var delegate: ColorViewControllerDelegate!
-    
-    let numberToolbar: UIToolbar = UIToolbar()
-    
+    unowned var delegate: ColorViewControllerDelegate!
     var color: UIColor!
     
     override func viewDidLoad() {
@@ -34,12 +31,14 @@ final class ColorViewController: UIViewController {
         
         colorLabel.layer.cornerRadius = 25
         
+        redSlider.tintColor = .red
+        greenSlider.tintColor = .green
+        
         colorLabel.backgroundColor = color
         
-        setValueColor(for: redSlider, greenSlider, blueSlider)
-        setValueText(for: redValueLabel, greenValueLabel, blueValueLabel)
-        
-        changeValueTextField()
+        setValue(for: redSlider, greenSlider, blueSlider)
+        setValue(for: redValueLabel, greenValueLabel, blueValueLabel)
+        setValue(for: redTextField, greenTextField, blueTextField)
         
         redTextField.delegate = self
         greenTextField.delegate = self
@@ -53,21 +52,25 @@ final class ColorViewController: UIViewController {
     
     @IBAction func sliderAction(_ sender: UISlider) {
         changeColor()
-        changeValueTextField()
+        //setValue()
         
         switch sender {
         case redSlider:
-            setValueText(for: redValueLabel)
+            setValue(for: redValueLabel)
         case greenSlider:
-            setValueText(for: greenValueLabel)
+            setValue(for: greenValueLabel)
         default:
-            setValueText(for: blueValueLabel)
+            setValue(for: blueValueLabel)
         }
     }
     
     @IBAction func doneButtonAction() {
         delegate.setColor(colorLabel.backgroundColor ?? .yellow)
         dismiss(animated: true)
+    }
+    
+    private func string(from slider: UISlider) -> String {
+        String(format: "%.2f", slider.value)
     }
     
     private func changeColor() {
@@ -79,31 +82,34 @@ final class ColorViewController: UIViewController {
         )
     }
     
-    private func changeValueTextField() {
-        redTextField.text = redValueLabel.text
-        greenTextField.text = greenValueLabel.text
-        blueTextField.text = blueValueLabel.text
+    private func setValue(for labels: UILabel...) {
+        labels.forEach { label in
+            switch label {
+            case redValueLabel: redValueLabel.text = string(from: redSlider)
+            case greenValueLabel: greenValueLabel.text = string(from: greenSlider)
+            default: label.text = string(from: blueSlider)
+            }
+        }
     }
     
-    private func setValueColor(for sliders: UISlider...) {
+    private func setValue(for sliders: UISlider...) {
         let color = CIColor(color: color)
         sliders.forEach { slider in
             switch slider {
             case redSlider: redSlider.value = Float(color.red)
             case greenSlider: greenSlider.value = Float(color.green)
-            case blueSlider: blueSlider.value = Float(color.blue)
-            default: break
+            default: slider.value = Float(color.blue)
             }
         }
     }
     
-    private func setValueText(for labels: UILabel...) {
-        labels.forEach { label in
-            switch label {
-            case redValueLabel: redValueLabel.text = String(format: "%.2f", redSlider.value)
-            case greenValueLabel: greenValueLabel.text = String(format: "%.2f", greenSlider.value)
-            case blueValueLabel: blueValueLabel.text = String(format: "%.2f", blueSlider.value)
-            default: break
+    private func setValue(for textFields: UITextField...) {
+        
+        textFields.forEach { textField in
+            switch textField {
+            case redTextField: textField.text = string(from: redSlider)
+            case greenTextField: textField.text = string(from: greenSlider)
+            default: textField.text = string(from: blueSlider)
             }
         }
     }
@@ -131,13 +137,13 @@ extension ColorViewController: UITextFieldDelegate {
             switch textField {
             case redTextField:
                 redSlider.setValue(currentValue, animated: true)
-                setValueText(for: redValueLabel)
+                setValue(for: redValueLabel)
             case greenTextField:
                 greenSlider.setValue(currentValue, animated: true)
-                setValueText(for: greenValueLabel)
+                setValue(for: greenValueLabel)
             default:
                 blueSlider.setValue(currentValue, animated: true)
-                setValueText(for: blueValueLabel)
+                setValue(for: blueValueLabel)
             }
             changeColor()
             
